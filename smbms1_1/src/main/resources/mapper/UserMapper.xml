@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.smbms.dao.user.UserMapper">
+    <sql id="selectUser">
+         select u.*,r.roleName from smbms_user u inner join smbms_role r on u.userRole=r.id
+    </sql>
+    <resultMap id="list1" type="cn.smbms.pojo.User">
+        <id property="id" column="id"/>
+        <result property="userCode" column="userCode"/>
+        <result property="userName" column="userName"/>
+        <result property="userPassword" column="userPassword"/>
+        <result property="gender" column="gender"/>
+        <result property="birthday" column="birthday"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
+        <result property="userRole" column="userRole"/>
+        <result property="createdBy" column="createdBy"/>
+        <result property="creationDate" column="creationDate"/>
+        <result property="modifyBy" column="modifyBy"/>
+        <result property="modifyDate" column="modifyDate"/>
+        <result property="age" column="age"/>
+        <result property="userRoleName" column="roleName"/>
+    </resultMap>
+
+    <select id="list" resultMap="list1">
+        <include refid="selectUser"/>
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="userCode !=null ">
+               u.userCode like  CONCAT('%',#{userCode},'%')
+            </if>
+            <if test="roleId !=null">
+                and  u.userRole=#{roleId}
+            </if>
+        </trim>
+        limit #{pageNo},#{pageSize}
+    </select>
+	<!--根据用户名查询密码-->
+
+	<select id="getUserByUserCode"  resultType="cn.smbms.pojo.User">
+		select  *  from smbms_user where userCode =#{userCode}
+	</select>
+   <!-- <select id="list" resultType="cn.smbms.pojo.User">
+		select * from smbms_user
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="userCode !=null ">
+				 userCode like  CONCAT('%',#{userCode},'%')
+			</if>
+			<if test="roleId !=null">
+				and userRole=#{roleId}
+			</if>
+		</trim>
+				limit #{pageNo},#{pageSize}
+	</select>-->
+
+
+	<select id="count" resultType="java.lang.Integer">
+		select count(1) as count from smbms_user
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="userCode !=null">
+				userCode like  CONCAT('%',#{userCode},'%')
+			</if>
+			<if test="roleId !=null">
+				and userRole=#{roleId}
+			</if>
+		</trim>
+	</select>
+
+    <select id="getUserById" resultMap="list1" parameterType="java.lang.Integer">
+       select * from smbms_user where id=#{id}
+       </select>
+
+
+    <insert id="save" parameterType="cn.smbms.pojo.User">
+        insert  into smbms_user(userCode,userName,userPassword,gender,birthday,phone,address,userRole,createdBy,creationDate)
+      values(#{userCode},#{userName},#{userPassword},#{gender},#{birthday},#{phone},#{address},#{userRole},#{createdBy},#{creationDate})
+    </insert>
+
+    <update id="modify" parameterType="cn.smbms.pojo.User">
+
+       update smbms_user set  userName=#{userName},gender=#{gender},birthday=#{birthday},phone=#{phone},address=#{address},userRole=#{userRole}
+
+       where id=#{id}
+
+    </update>
+    
+    <delete id="deleteById" parameterType="Integer">
+        delete from smbms_user where id=#{id}
+    </delete>
+
+    <select id="getUserByName"  resultType="cn.smbms.pojo.User">
+		select  *  from smbms_user where userName =#{userName}
+	</select>
+
+</mapper>
